@@ -1,5 +1,6 @@
 // pages/main/index.js
 var QR = require("../../utils/qrcode.js");
+var version ='#version1'; 
 Page({
   data:{
     canvasHidden:false,
@@ -77,7 +78,9 @@ Page({
   },
   formSubmit: function(e) {
     var that = this;
-    var url = e.detail.value.url;
+    var url = e.detail.value.url + version;
+    
+    console.log(url);
     that.setData({
       maskHidden:false,
     });
