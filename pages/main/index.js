@@ -5,7 +5,8 @@ Page({
     canvasHidden:false,
     maskHidden:true,
     imagePath:'',
-    placeholder:'学生姓名 + 学生生日'
+    placeholder:'学生姓名生日. (张三+2000-09-28)'
+    
   },
   onLoad:function(options){   
     var size = this.setCanvasSize();
