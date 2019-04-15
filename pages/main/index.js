@@ -6,13 +6,13 @@ Page({
     canvasHidden: false,
     maskHidden: true,
     imagePath: '',
-    placeholder: '学生姓名生日. (张三+2000-09-28)'
+    placeholder: '姓名+生日.(张三+2000-09-28)'
 
   },
   onLoad: function(options) {
     var size = this.setCanvasSize();
     var initUrl = this.data.placeholder;
-    this.createQrCode(initUrl, "mycanvas", size.w, size.h);
+    //this.createQrCode(initUrl, "mycanvas", size.w, size.h);
   },
   onReady: function() {
 
@@ -79,34 +79,74 @@ Page({
     })
   },
   formSubmit: function(e) {
-    var that = this;
-    var text = replaceSpace(e.detail.value.url);
-    console.log(text);
-    that.setData({
-      maskHidden: false,
+    var localvar = e.detail.value.url;
+    this.setData({
+      imagePath: ''
     });
-    wx.showToast({
-      title: '生成中...',
-      icon: 'loading',
-      duration: 4000
-    });
-    var st = setTimeout(function() {
-      wx.hideToast()
-      var size = that.setCanvasSize();
-      //绘制二维码
-      that.createQrCode(text, "mycanvas", size.w, size.h);
+    if (isFormatOk(localvar)) {
+      var text = replaceSpace(localvar);
+      var that = this;
+
+      console.log(text);
       that.setData({
-        maskHidden: true
+        maskHidden: false,
       });
-      clearTimeout(st);
-    }, 3000)
+      wx.showToast({
+        title: '生成中...',
+        icon: 'loading',
+        duration: 4000
+      });
+      var st = setTimeout(function() {
+        wx.hideToast()
+        var size = that.setCanvasSize();
+        //绘制二维码
+        that.createQrCode(text, "mycanvas", size.w, size.h);
+        that.setData({
+          maskHidden: true
+        });
+        clearTimeout(st);
+      }, 3000)
+    }
   }
 })
 
-function replaceSpace(txt) {
-  var vals = txt.split('+');
-  var val1 = vals[0].trim().replace(/\s+/g, '_');
-  var val2 = vals[1].replace(/\s+/g, '');
-  return val1 + '+' + val2 + version;
-
+function isFormatOk(txt) {
+  if (txt == undefined || txt == '') {
+    wx.showModal({
+      title: '提示',
+      content: '信息没填',
+      success: function(sm) {
+        return 'false';
+      }
+    })
+  } else {
+    var vals = txt.split('+');
+    if (vals.length < 2) {
+      wx.showModal({
+        title: '提示',
+        content: '没用+分割',
+        success: function(sm) {
+          return 'false';
+        }
+      })
+    } else {
+      if (vals[1] == '') {
+        wx.showModal({
+          title: '提示',
+          content: '+后信息没填',
+          success: function(sm) {
+            return 'false';
+          }
+        })
+      } else {
+        return true;
+      }
+    }
+  }
 }
+  function replaceSpace(txt) {
+    var vals = txt.split('+');
+    var val1 = vals[0].trim().replace(/\s+/g, '_');
+    var val2 = vals[1].replace(/\s+/g, '');
+    return val1 + '+' + val2 + version;
+  }
