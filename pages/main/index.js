@@ -9,26 +9,22 @@ Page({
     maskHidden: true,
     imagePath: '',
     placeholder: '学生姓名+生日+家长姓名'
-
   },
   onLoad: function(options) {},
   onReady: function() {},
   onShow: function() { },
   onHide: function() {},
-
   onUnload: function() {},
-  //适配不同屏幕大小的canvas
   setCanvasSize: function() {
     var size = {};
     try {
       var res = wx.getSystemInfoSync();
       var scale = 750 / 686;
       var width = res.windowWidth / scale;
-      var height = width; //canvas画布为正方形
+      var height = width;
       size.w = width;
       size.h = height;
     } catch (e) {
-      // Do something when catch error
       console.log("获取设备信息失败" + e);
     }
     return size;
@@ -38,7 +34,6 @@ Page({
     setTimeout(() => {
       this.canvasToTempImage();
     }, 1000);
-
   },
 
   canvasToTempImage: function() {
@@ -66,6 +61,7 @@ Page({
       urls: [img]
     })
   },
+
   formSubmit: function(e) {
     var localvar = e.detail.value.url;
     this.setData({
@@ -74,7 +70,7 @@ Page({
     if (isFormatOk(localvar)) {
       var text = replaceSpace(localvar);
       var that = this;
-      //console.log(text);
+      console.log(text);
       var cryText = encrypt(text);
       console.log(cryText);
       that.setData({
