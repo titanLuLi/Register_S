@@ -1,8 +1,12 @@
 // pages/main/index.js
 var QR = require("../../utils/qrcode.js");
-var fun_aes = require('../../utils/aes.js')
-var key = fun_aes.CryptoJS.enc.Utf8.parse("12sdd%&3MFe454Øæ");
-var iv = fun_aes.CryptoJS.enc.Utf8.parse('+45*,:æøåw1CB308');
+var fun_base64 = require('../../utils/base64.js');
+var util = require('../../utils/util.js');
+
+var obj_base64 = new fun_base64.Base64();
+var obj_base642 = new fun_base64.Base64();
+
+
 Page({
   data: {
     canvasHidden: false,
@@ -62,6 +66,10 @@ Page({
     })
   },
 
+  
+  //base64加密
+
+
   formSubmit: function(e) {
     var localvar = e.detail.value.url;
     this.setData({
@@ -71,11 +79,14 @@ Page({
       var text = replaceSpace(localvar);
       var that = this;
       console.log(text);
-      var cryText = encrypt(text);
+      var cryText = obj_base64.encode(text);
+      //base64解密 
       console.log(cryText);
       that.setData({
         maskHidden: false,
-      });
+      });    
+      var o_data = obj_base642.decode(cryText);
+      console.log("o_data:" + o_data);
       wx.showToast({
         title: '生成中...',
         icon: 'loading',
@@ -124,15 +135,6 @@ function replaceSpace(txt) {
   var val1 = vals[0].trim();
   var val2 = vals[1].trim();
   var val3 = vals[2].trim();
-  return val1 + '+' + val2 + '+' + val3;
-}
+  var id = util.hashCode(val1 + val2);
+  return id+'+'+ val1 + '+' + val2 + '+' + val3;}
 
-function encrypt(word) {
-  var srcs = fun_aes.CryptoJS.enc.Utf8.parse(word);
-  var encrypted = fun_aes.CryptoJS.AES.encrypt(srcs, key, {
-    iv: iv,
-    mode: fun_aes.CryptoJS.mode.CBC,
-    padding: fun_aes.CryptoJS.pad.Pkcs7
-  });
-  return encrypted.ciphertext.toString().toUpperCase();
-};
