@@ -1,34 +1,22 @@
 // pages/main/index.js
 var QR = require("../../utils/qrcode.js");
-var version = '#version1';
+var fun_aes = require('../../utils/aes.js')
+var key = fun_aes.CryptoJS.enc.Utf8.parse("12sdd%&3MFe454Øæ");
+var iv = fun_aes.CryptoJS.enc.Utf8.parse('+45*,:æøåw1CB308');
 Page({
   data: {
     canvasHidden: false,
     maskHidden: true,
     imagePath: '',
-    placeholder: '姓名+生日.(张三+2000-09-28)'
+    placeholder: '学生姓名+生日+家长姓名'
 
   },
-  onLoad: function(options) {
-    var size = this.setCanvasSize();
-    var initUrl = this.data.placeholder;
-    //this.createQrCode(initUrl, "mycanvas", size.w, size.h);
-  },
-  onReady: function() {
+  onLoad: function(options) {},
+  onReady: function() {},
+  onShow: function() { },
+  onHide: function() {},
 
-  },
-  onShow: function() {
-
-    // 页面显示
-  },
-  onHide: function() {
-    // 页面隐藏
-  },
-
-  onUnload: function() {
-    // 页面关闭
-
-  },
+  onUnload: function() {},
   //适配不同屏幕大小的canvas
   setCanvasSize: function() {
     var size = {};
@@ -86,21 +74,21 @@ Page({
     if (isFormatOk(localvar)) {
       var text = replaceSpace(localvar);
       var that = this;
-
-      console.log(text);
+      //console.log(text);
+      var cryText = encrypt(text);
+      console.log(cryText);
       that.setData({
         maskHidden: false,
       });
       wx.showToast({
         title: '生成中...',
         icon: 'loading',
-        duration: 4000
+        duration: 3000
       });
       var st = setTimeout(function() {
         wx.hideToast()
         var size = that.setCanvasSize();
-        //绘制二维码
-        that.createQrCode(text, "mycanvas", size.w, size.h);
+        that.createQrCode(cryText, "mycanvas", size.w, size.h);
         that.setData({
           maskHidden: true
         });
@@ -111,42 +99,44 @@ Page({
 })
 
 function isFormatOk(txt) {
-  if (txt == undefined || txt == '') {
+  var vals = txt.split('+');
+  if (txt == '' || vals.length < 3) {
     wx.showModal({
       title: '提示',
-      content: '信息没填',
+      content: '缺少信息 "张三+2014-09-28+张二"',
       success: function(sm) {
         return 'false';
       }
     })
   } else {
-    var vals = txt.split('+');
-    if (vals.length < 2) {
+    if (vals[2] == '') {
       wx.showModal({
         title: '提示',
-        content: '没用+分割',
+        content: '缺少信息 "张三+2014-09-28+张一"',
         success: function(sm) {
           return 'false';
         }
       })
     } else {
-      if (vals[1] == '') {
-        wx.showModal({
-          title: '提示',
-          content: '+后信息没填',
-          success: function(sm) {
-            return 'false';
-          }
-        })
-      } else {
-        return true;
-      }
+      return true;
     }
   }
 }
-  function replaceSpace(txt) {
-    var vals = txt.split('+');
-    var val1 = vals[0].trim().replace(/\s+/g, '_');
-    var val2 = vals[1].replace(/\s+/g, '');
-    return val1 + '+' + val2 + version;
-  }
+
+function replaceSpace(txt) {
+  var vals = txt.split('+');
+  var val1 = vals[0].trim();
+  var val2 = vals[1].trim();
+  var val3 = vals[2].trim();
+  return val1 + '+' + val2 + '+' + val3;
+}
+
+function encrypt(word) {
+  var srcs = fun_aes.CryptoJS.enc.Utf8.parse(word);
+  var encrypted = fun_aes.CryptoJS.AES.encrypt(srcs, key, {
+    iv: iv,
+    mode: fun_aes.CryptoJS.mode.CBC,
+    padding: fun_aes.CryptoJS.pad.Pkcs7
+  });
+  return encrypted.ciphertext.toString().toUpperCase();
+};
