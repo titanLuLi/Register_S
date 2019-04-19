@@ -135,6 +135,5 @@ function replaceSpace(txt) {
   var val1 = vals[0].trim();
   var val2 = vals[1].trim();
   var val3 = vals[2].trim();
-  var id = util.hashCode(val1 + val2);
-  return id+'+'+ val1 + '+' + val2 + '+' + val3;}
+  return val1 + '+' + val2 + '+' + val3;}
 
